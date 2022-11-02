@@ -20,13 +20,35 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const userCollection = client.db("mongodbNode").collection("userSet");
-    const user = { name: "Maruf", email: "maruf112@gmail.com" };
-    const result = await userCollection.insertOne(user);
-    console.log(result);
+    // const user = { name: "Maruf", email: "maruf112@gmail.com" };
+    // const result = await userCollection.insertOne(user);
+    // console.log(result);
+
+    // show data on the browser from database
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const cursor = userCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // post data from client to server
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
   } finally {
   }
 }
 run().catch((err) => console.log(err));
+
+// delete from the server
+app.delete("/users/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(`Trying to delete ${id}`);
+});
 
 app.get("/", (req, res) => {
   res.send("I am on HOME.");
